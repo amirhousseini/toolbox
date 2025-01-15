@@ -1,5 +1,5 @@
 {
-  "name": "@amirhosseini/toolbox",
+  "name": "ah_toolbox",
   "version": "1.0.0",
   "description": "Collection of classes and functions of general utility",
   "main": "index.js",
