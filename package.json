@@ -1,5 +1,5 @@
 {
-  "name": "ah_toolbox",
+  "name": "ah-toolbox",
   "version": "1.0.0",
   "description": "Collection of classes and functions of general utility",
   "main": "index.js",
