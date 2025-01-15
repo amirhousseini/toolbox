@@ -1,0 +1,22 @@
+{
+  "name": "@amirhosseini/toolbox",
+  "version": "1.0.0",
+  "description": "Collection of classes and functions of general utility",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amirhousseini/toolbox.git"
+  },
+  "author": "Amir Housseini",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amirhousseini/toolbox/issues"
+  },
+  "homepage": "https://github.com/amirhousseini/toolbox#readme"
+}
