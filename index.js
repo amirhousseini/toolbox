@@ -5,11 +5,18 @@
 'use strict';
 
 /**
+ * Return whether the value passed as argument is a finite integer or not.
+ * @param {Number|String} value Value to validate
+ * @returns Boolean
+ */
+const isInteger = (value) => isFinite(value) && Math.floor(value) == value;
+
+/**
  * Return the integer corresponding to the value passed as argument if it is a finite integer,
  * or the specified default value if the value is undefined.
  * The optional validator function is a boolean function returning whether the integer is valid or not.
  * The validator argument is ignored if it is preceded by the errorMessage argument.
- * @param {Number} value Value
+ * @param {Number|String} value Value
  * @param {Function} validator Optional validator function
  * @param {String} errorMessage Optional error message used in the exception
  * @param {Number} defaultValue Returned value if value is undefined
@@ -48,15 +55,6 @@ function getInteger(value, validator, errorMessage, defaultValue) {
 }
 
 /**
- * Return whether the value passed as argument is strictly a finite integer or not.
- * @param {Number} value Value to validate
- * @returns Boolean
- */
-function isInteger(value) {
-    isFinite(value) && Math.floor(value) == value;
-}
-
-/**
  * Function to handle optional function arguments with default values.
  * @param {*} args The arguments variable
  * @param {*} types The list of argument types (typeof)
@@ -83,16 +81,15 @@ function handleOptionalArgs(args, types, dflts) {
 
 /**
  * Set the property of an object.
- * If target is undefined or null a new object is created and returned.
- * The function does nothing if key or value are either undefined or null.
+ * If target is undefined or null an empty object is created, used and returned.
+ * The function leaves target unchanged if key or value are undefined or null.
  * If key or value are functions they are evaluated first.
  * @param {Object} target Target object.
  * @param {any} key Property key.
  * @param {any} value Property value.
  * @return the target object.
  */
-function setProperty(target, key, value) {
-    if (target === undefined || target === null) target = {};
+function setProperty(target = {}, key, value) {
     if (key !== undefined && key !== null &&
         value !== undefined && value !== null) {
         if (typeof key === "function") key = key();
@@ -103,65 +100,23 @@ function setProperty(target, key, value) {
 };
 
 /**
- * This function works similarly than Object#assign by assigning properties of source
- * objects to a target object from left to right, but differently than Object#assign
- * it ignores properties that are either undefined or null (see function setProperty()
- * in this module).
- * If target is undefined or null a new object is created, used and returned.
+ * Merge object properties.
+ * This function works similarly to Object#assign by assigning properties of source
+ * objects to a target object from left to right, but other than Object#assign
+ * it ignores properties that are undefined or null (see setProperty() in this module).
+ * If target is undefined or null an empty object is created, used and returned.
  * @param {Object} target Target object.
  * @param {...Object} sources Source objects. 
  * @returns The target object.
  */
-function merge(target, ...sources) {
-    if (target === undefined || target === null) target = {};
-    for (let source of sources) {
-        if (source === undefined || source === null) continue;
-        for (let [ key, value ] of Object.entries(source)) {
-            setProperty(target, key, value);
-        }
-    }
-    return target;
-}
-
-const factorialCache = [];
-const maxFactorialArgument = 170;
-
-/**
- * Return the factorial n! of the integer n.
- * @param {Number} n Number
- * @returns The factorial or Infinity if n is greater than 170.
- * @throws {TypeError} if n is not an integer.
- * @throws {RangeError} if n is a negative integer.
- */
-function factorial(n) {
-    n = getInteger(n, n => n >= 0, "Factorial argument must be a non-negative integer");
-    if (n > maxFactorialArgument) return Infinity;
-    if (factorialCache[n] === undefined) {
-        const f = (n) => n > 1 ? n * f(n - 1) : 1;
-        factorialCache[n] = f(n);    
-    }
-    return factorialCache[n];
-}
-
-/**
- * Return the addition of an array of numbers.
- * @param {Array<number>} numbers Array of numbers
- * @returns The addition.
- */
-function sum(numbers) {
-    if (numbers === undefined || !Array.isArray(numbers) || numbers.length === 0) return undefined;
-    return numbers.reduce((previous, current) => previous += current);
-}
-
-/**
- * Return the multiplication of an array of numbers.
- * @param {Array<number>} numbers Array of numbers
- * @returns The multiplication.
- */
-function mult(numbers) {
-    if (numbers === undefined || !Array.isArray(numbers) || numbers.length === 0) return undefined;
-    return numbers.reduce((previous, current) => previous *= current);
-}
+const mergeProperties = (target = {}, ...sources) =>
+    sources
+    .filter(source => source && typeof source === 'object')
+    .reduce((_, source) =>
+        Object.entries(source).reduce((_, [key, value]) =>
+            setProperty(target, key, value),
+            target),
+        target);
 
 /**
  * Generator of a sequence of integers in a specific range.
@@ -184,7 +139,7 @@ function* enumeration(start = 0, end = start) {
 
 /**
  * Generator of a sequence of specified items.
- * The generator skips undefined items and flatten arrays.
+ * The generator skips undefined or null items and flatten arrays.
  * @param {any} items Items generated by the generator
  * @returns Generator function.
  */
@@ -258,7 +213,7 @@ function mappedSequence(sequence, callbackFn) {
 }
 
 module.exports = {
-    getInteger, isInteger, handleOptionalArgs, setProperty, merge,
-    factorial, sum, mult,
+    isInteger, getInteger, handleOptionalArgs,
+    setProperty, mergeProperties,
     enumeration, sequenceOf, subSequence, mappedSequence,
 }
